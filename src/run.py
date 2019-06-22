@@ -10,16 +10,16 @@ from torchsummary import summary
 
 from SegmentationAgent import SegmentationAgent
 
-VAL_PERCENTAGE = 0.2
-TEST_NUM = 10
-NUM_CLASSES = 13
-BATCH_SIZE = 16
-IMG_SIZE = 224
-DATA_PATH = Path('../input')
-SHUFFLE = True
-LR = 0.001
-EPOCHS = 30
-DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
+VAL_PERCENTAGE = 0.2  # Amount of data to use for validation
+TEST_NUM = 10  # Number of images to set aside for testing and visualization
+NUM_CLASSES = 13  # Total number of classes in the dataset
+BATCH_SIZE = 16  # Batch size for training
+IMG_SIZE = 224  # The input size for model
+DATA_PATH = Path('../input')  # Location of the dataset
+SHUFFLE = True  # Shuffle the dataset before making the split
+LR = 0.001  # Learning rate for the model
+EPOCHS = 30  # Number of epochs to train the model
+DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'  # Device used to train
 
 agent = SegmentationAgent(VAL_PERCENTAGE, TEST_NUM, NUM_CLASSES,
                           BATCH_SIZE, IMG_SIZE, DATA_PATH, SHUFFLE, LR, DEVICE)
@@ -38,6 +38,9 @@ validation_loss = []
 
 @trainer.on(Events.EPOCH_COMPLETED)
 def log_training_results(engine):
+    """
+    Print training accuracy and loss after each epoch
+    """
     evaluator.run(agent.train_loader)
     metrics = evaluator.state.metrics
     avg_accuracy = metrics['accuracy']
@@ -51,6 +54,9 @@ def log_training_results(engine):
 
 @trainer.on(Events.EPOCH_COMPLETED)
 def log_validation_results(engine):
+    """
+    Print validation accuracy and loss after each epoch
+    """
     evaluator.run(agent.validation_loader)
     metrics = evaluator.state.metrics
     avg_accuracy = metrics['accuracy']
@@ -62,9 +68,13 @@ def log_validation_results(engine):
                     engine.state.epoch, avg_accuracy, avg_loss))
 
 
+# Print summary of the model
 summary(agent.model, (3, IMG_SIZE, IMG_SIZE))
 
+# Train model
 trainer.run(agent.train_loader, max_epochs=EPOCHS)
+
+# Save the model's weights after training is complete
 torch.save(agent.model.state_dict(), 'model.pt')
 
 plt.figure(figsize=(30, 5))
@@ -86,15 +96,16 @@ plt.legend()
 plt.grid()
 plt.show()
 
+# Test the model on the test images
 images, masks = next(iter(agent.test_loader))
 preds = agent.model(images)
 acc = Accuracy()
 acc.update([preds, masks])
-print('Accuracy: {}'.format(acc.compute()))
+print('Test Accuracy: {}'.format(acc.compute()))
 
 loss = agent.criterion(preds, masks)
 loss = loss.cpu().detach().numpy()
-print('Loss: {}'.format(loss))
+print('Test Loss: {}'.format(loss))
 
 images = images.cpu().numpy()
 masks = masks.cpu().numpy()

@@ -5,6 +5,15 @@ from torch.nn.functional import relu
 
 
 def conv(in_channels, out_channels, kernel_size=3, padding=1, batch_norm=True):
+    """
+    A convolution block with a conv layer and batch norm
+    :param in_channels: number of input channels
+    :param out_channels: number of output channels
+    :param kernel_size: size of the kernel
+    :param padding: number of pixels to pad on all sides
+    :param batch_norm: to use batch norm or not
+    :return: PyTorch Tensor
+    """
     c = Conv2d(in_channels, out_channels, kernel_size=kernel_size, stride=1,
                padding=padding)
     if batch_norm:
@@ -15,6 +24,12 @@ def conv(in_channels, out_channels, kernel_size=3, padding=1, batch_norm=True):
 
 class DownConv(Module):
     def __init__(self, in_channels, out_channels, pooling=True):
+        """
+        A PyTorch Module to create the downward block of UNet architecture
+        :param in_channels: number of input channels
+        :param out_channels: number of output channels
+        :param pooling: to use pooling or not
+        """
         super(DownConv, self).__init__()
 
         self.in_channels = in_channels
@@ -37,9 +52,12 @@ class DownConv(Module):
 
 
 class UpConv(Module):
-    def __init__(self,
-                 in_channels,
-                 out_channels):
+    def __init__(self, in_channels, out_channels):
+        """
+        A PyTorch Module to create the upward block of UNet architecture
+        :param in_channels: number of input channels
+        :param out_channels: number of output channels
+        """
         super(UpConv, self).__init__()
 
         self.in_channels = in_channels
@@ -62,6 +80,14 @@ class UpConv(Module):
 class SegmentationUNet(Module):
     def __init__(self, num_classes, device, in_channels=3, depth=5,
                  start_filts=64):
+        """
+        The UNet model
+        :param num_classes: number of classes to segment
+        :param device: device on which the model is to be trained
+        :param in_channels: number of input channels
+        :param depth: the depth of the model
+        :param start_filts: number of filters in the starting block
+        """
         super(SegmentationUNet, self).__init__()
 
         self.num_classes = num_classes

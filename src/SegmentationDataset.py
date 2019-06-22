@@ -6,6 +6,14 @@ from torch.utils.data import Dataset
 
 class SegmentationDataset(Dataset):
     def __init__(self, image_paths, mask_paths, size, num_classes, device):
+        """
+        Class extending the PyTorch Dataset class
+        :param image_paths: list with paths to images
+        :param mask_paths: list with paths to masks
+        :param size: size to which the image is resized
+        :param num_classes: number of classes to classify
+        :param device: device on which the model is trained
+        """
         self.image_paths = image_paths
         self.mask_paths = mask_paths
         self.size = size
