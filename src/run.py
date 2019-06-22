@@ -6,6 +6,7 @@ from ignite.engine import Events
 from ignite.engine import create_supervised_evaluator, create_supervised_trainer
 from ignite.metrics import Accuracy, Loss
 from matplotlib import pyplot as plt
+from torchsummary import summary
 
 from SegmentationAgent import SegmentationAgent
 
@@ -69,6 +70,8 @@ def log_validation_results(engine):
         "Validation - Epoch: {} Avg accuracy: {:.2f} Avg loss: {:.2f}".format(
             engine.state.epoch, avg_accuracy, avg_loss))
 
+
+summary(agent.model, (3, IMG_SIZE, IMG_SIZE))
 
 trainer.run(agent.train_loader, max_epochs=EPOCHS)
 torch.save(agent.model.state_dict(), 'model.pt')
