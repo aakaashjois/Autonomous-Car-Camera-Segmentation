@@ -1,4 +1,4 @@
-import torch
+from torch import cat
 from torch import nn
 from torchvision import models
 
@@ -10,16 +10,16 @@ class SegmentationFCN(nn.Module):
         self.device = device
         self.backend = models.resnet18(pretrained=True)
         layers = list(self.backend.children())
-        self.layer1 = nn.Sequential(*layers[:5])  # size=(N, 64, x.H/2, x.W/2)
+        self.layer1 = nn.Sequential(*layers[:5])
         self.upsample1 = nn.Upsample(scale_factor=4, mode='bilinear',
                                      align_corners=False)
-        self.layer2 = layers[5]  # size=(N, 128, x.H/4, x.W/4)
+        self.layer2 = layers[5]
         self.upsample2 = nn.Upsample(scale_factor=8, mode='bilinear',
                                      align_corners=False)
-        self.layer3 = layers[6]  # size=(N, 256, x.H/8, x.W/8)
+        self.layer3 = layers[6]
         self.upsample3 = nn.Upsample(scale_factor=16, mode='bilinear',
                                      align_corners=False)
-        self.layer4 = layers[7]  # size=(N, 512, x.H/16, x.W/16)
+        self.layer4 = layers[7]
         self.upsample4 = nn.Upsample(scale_factor=32, mode='bilinear',
                                      align_corners=False)
 
@@ -37,7 +37,7 @@ class SegmentationFCN(nn.Module):
         x = self.layer4(x)
         up4 = self.upsample4(x)
 
-        merge = torch.cat([up1, up2, up3, up4], dim=1)
+        merge = cat([up1, up2, up3, up4], dim=1)
         merge = self.conv(merge)
         out = self.softmax(merge)
         return out.float()

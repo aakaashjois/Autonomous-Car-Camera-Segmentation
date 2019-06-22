@@ -36,8 +36,8 @@ class SegmentationDataset(Dataset):
         mask = mask.to(self.device)
         return image, mask
 
-    def one_hot_encode(self, mask):
-        y = mask.ravel()
-        one_hot = np.zeros((y.shape[0], self.num_classes))
-        one_hot[np.arange(y.shape[0]), y] = 1
-        return np.reshape(one_hot, mask.shape + (self.num_classes,))
+# def one_hot_encode(mask, num_classes):
+#     y = mask.ravel()
+#     one_hot = np.zeros((y.shape[0], num_classes))
+#     one_hot[np.arange(y.shape[0]), y] = 1
+#     return np.reshape(one_hot, mask.shape + (num_classes,))

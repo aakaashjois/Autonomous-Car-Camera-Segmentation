@@ -131,3 +131,5 @@ data/
 
 # PyCharm settings
 .idea/
+
+models/
