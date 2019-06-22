@@ -61,7 +61,7 @@ class UpConv(Module):
 
 
 class SegmentationUNet(Module):
-    def __init__(self, num_classes, device, in_channels=3, depth=5,
+    def __init__(self, num_classes, device, in_channels=3, depth=7,
                  start_filts=64):
         super(SegmentationUNet, self).__init__()
 
