@@ -1,17 +1,16 @@
 from torch.nn import Module, ModuleList, Conv2d, MaxPool2d, ConvTranspose2d, \
-    BatchNorm2d, Sequential
+    BatchNorm2d, ReLU, Sequential
 from torch.nn import functional as f
 from torch import cat
 
 
 def conv(in_channels, out_channels, kernel_size=3, padding=1, batch_norm=True):
-    c = Conv2d(in_channels, out_channels, kernel_size=kernel_size,
-               stride=1, padding=padding)
+    c = Conv2d(in_channels, out_channels, kernel_size=kernel_size, stride=1,
+               padding=padding)
     if batch_norm:
         bn = BatchNorm2d(out_channels)
         return Sequential(c, bn)
-    else:
-        return c
+    return c
 
 
 class DownConv(Module):
@@ -61,7 +60,7 @@ class UpConv(Module):
 
 
 class SegmentationUNet(Module):
-    def __init__(self, num_classes, device, in_channels=3, depth=7,
+    def __init__(self, num_classes, device, in_channels=3, depth=5,
                  start_filts=64):
         super(SegmentationUNet, self).__init__()
 

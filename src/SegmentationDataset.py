@@ -19,7 +19,7 @@ class SegmentationDataset(Dataset):
     def __getitem__(self, idx):
         image = np.array(
             Image.open(self.image_paths[idx]).resize((self.size, self.size),
-                                                     resample=Image.LANCZOS))
+                                                     resample=Image.BILINEAR))
         # Normalize between 0 and 1
         image = image / 255
         # Standardize to pretrained input image values

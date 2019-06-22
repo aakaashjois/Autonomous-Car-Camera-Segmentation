@@ -1,8 +1,8 @@
 import numpy as np
 from torch.utils.data import DataLoader
-from torch.nn import CrossEntropyLoss
 from torch.optim import Adam
 
+from CustomLoss import CustomLoss
 from SegmentationDataset import SegmentationDataset
 from models.SegmentationUNet import SegmentationUNet
 
@@ -23,7 +23,7 @@ class SegmentationAgent:
         self.validation_loader = self.get_dataloader(val_split)
         self.test_loader = self.get_dataloader(test_split)
         self.model = SegmentationUNet(self.num_classes, self.device)
-        self.criterion = CrossEntropyLoss()
+        self.criterion = CustomLoss(self.num_classes, self.device)
         self.optimizer = Adam(self.model.parameters(), lr=learning_rate)
         self.model.to(self.device)
 
