@@ -1,10 +1,11 @@
-from CustomLoss import CustomLoss
-from SegmentationDataset import SegmentationDataset
-from models.SegmentationUNet import SegmentationUNet
-
 import numpy as np
-from torch.utils.data import DataLoader
 from torch.optim import Adam
+from torch.utils.data import DataLoader
+
+from SegmentationDataset import SegmentationDataset
+from SegmentationUNet import SegmentationUNet
+from TverskyCrossEntropyDiceWeightedLoss import \
+    TverskyCrossEntropyDiceWeightedLoss
 
 
 class SegmentationAgent:
@@ -23,7 +24,8 @@ class SegmentationAgent:
         self.validation_loader = self.get_dataloader(val_split)
         self.test_loader = self.get_dataloader(test_split)
         self.model = SegmentationUNet(self.num_classes, self.device)
-        self.criterion = CustomLoss(self.num_classes, self.device)
+        self.criterion = TverskyCrossEntropyDiceWeightedLoss(self.num_classes,
+                                                             self.device)
         self.optimizer = Adam(self.model.parameters(), lr=learning_rate)
         self.model.to(self.device)
 
@@ -65,33 +67,3 @@ class SegmentationAgent:
         return DataLoader(SegmentationDataset(split[0], split[1], self.img_size,
                                               self.num_classes, self.device),
                           self.batch_size, shuffle=True)
-
-    # def accuracy(self, preds, targets):
-    #     valid = (targets >= 0)
-    #     acc_sum = (valid * (preds == targets)).sum()
-    #     valid_sum = valid.sum()
-    #     acc = float(acc_sum) / (valid_sum + 1e-10)
-    #     return acc
-    #
-    # def intersectionAndUnion(imPred, imLab, numClass):
-    #     imPred = np.asarray(imPred).copy()
-    #     imLab = np.asarray(imLab).copy()
-    #
-    #     imPred += 1
-    #     imLab += 1
-    #     # Remove classes from unlabeled pixels in gt image.
-    #     # We should not penalize detections in unlabeled portions of the image.
-    #     imPred = imPred * (imLab > 0)
-    #
-    #     # Compute area intersection:
-    #     intersection = imPred * (imPred == imLab)
-    #     (area_intersection, _) = np.histogram(
-    #         intersection, bins=numClass, range=(1, numClass))
-    #
-    #     # Compute area union:
-    #     (area_pred, _) = np.histogram(imPred, bins=numClass,
-    #                                   range=(1, numClass))
-    #     (area_lab, _) = np.histogram(imLab, bins=numClass, range=(1, numClass))
-    #     area_union = area_pred + area_lab - area_intersection
-    #
-    #     return (area_intersection, area_union)

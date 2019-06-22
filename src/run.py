@@ -1,12 +1,14 @@
-import numpy as np
-from SegmentationAgent import SegmentationAgent
 from pathlib import Path
+
+import numpy as np
 import torch
-from ignite.engine import Events
-from ignite.engine import create_supervised_evaluator, create_supervised_trainer
+from ignite.engine import Events, create_supervised_evaluator, \
+    create_supervised_trainer
 from ignite.metrics import Accuracy, Loss
 from matplotlib import pyplot as plt
 from torchsummary import summary
+
+from SegmentationAgent import SegmentationAgent
 
 NUM_DATA = 1000
 TRAIN_NUM = 800
@@ -111,8 +113,6 @@ plt.figure(figsize=(30, 10))
 for i in range(len(images)):
     plt.subplot(1, len(images), i + 1)
     image = np.moveaxis(images[i], 0, -1)
-    image = image * [0.229, 0.224, 0.225]
-    image = image + [0.485, 0.456, 0.406]
     image = image * 255
     image = image.astype(int)
     plt.imshow(image)

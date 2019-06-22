@@ -1,7 +1,7 @@
-from torch.nn import Module, ModuleList, Conv2d, MaxPool2d, ConvTranspose2d, \
-    BatchNorm2d, Sequential
-from torch.nn import functional as f
 from torch import cat
+from torch.nn import BatchNorm2d, Conv2d, ConvTranspose2d, MaxPool2d, Module, \
+    ModuleList, Sequential
+from torch.nn.functional import relu
 
 
 def conv(in_channels, out_channels, kernel_size=3, padding=1, batch_norm=True):
@@ -21,15 +21,15 @@ class DownConv(Module):
         self.out_channels = out_channels
         self.pooling = pooling
 
-        self.conv1 = conv(self.in_channels, self.out_channels)
-        self.conv2 = conv(self.out_channels, self.out_channels)
+        self.conv_in = conv(self.in_channels, self.out_channels)
+        self.conv_out = conv(self.out_channels, self.out_channels)
 
         if self.pooling:
             self.pool = MaxPool2d(kernel_size=2, stride=2)
 
     def forward(self, x):
-        x = f.relu(self.conv1(x))
-        x = f.relu(self.conv2(x))
+        x = relu(self.conv_in(x))
+        x = relu(self.conv_out(x))
         before_pool = x
         if self.pooling:
             x = self.pool(x)
@@ -48,14 +48,14 @@ class UpConv(Module):
         self.upconv = ConvTranspose2d(self.in_channels, self.out_channels,
                                       kernel_size=2, stride=2)
 
-        self.conv1 = conv(2 * self.out_channels, self.out_channels)
-        self.conv2 = conv(self.out_channels, self.out_channels)
+        self.conv_in = conv(2 * self.out_channels, self.out_channels)
+        self.conv_out = conv(self.out_channels, self.out_channels)
 
     def forward(self, from_down, from_up):
         from_up = self.upconv(from_up, output_size=from_down.size())
         x = cat((from_up, from_down), 1)
-        x = f.relu(self.conv1(x))
-        x = f.relu(self.conv2(x))
+        x = relu(self.conv_in(x))
+        x = relu(self.conv_out(x))
         return x
 
 
@@ -73,6 +73,7 @@ class SegmentationUNet(Module):
         self.down_convs = []
         self.up_convs = []
 
+        outs = 0
         for i in range(depth):
             ins = self.in_channels if i == 0 else outs
             outs = self.start_filts * (2 ** i)
