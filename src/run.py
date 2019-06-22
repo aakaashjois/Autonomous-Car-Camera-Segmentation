@@ -1,14 +1,12 @@
-from pathlib import Path
-
 import numpy as np
+from SegmentationAgent import SegmentationAgent
+from pathlib import Path
 import torch
 from ignite.engine import Events
 from ignite.engine import create_supervised_evaluator, create_supervised_trainer
 from ignite.metrics import Accuracy, Loss
 from matplotlib import pyplot as plt
 from torchsummary import summary
-
-from SegmentationAgent import SegmentationAgent
 
 NUM_DATA = 1000
 TRAIN_NUM = 800

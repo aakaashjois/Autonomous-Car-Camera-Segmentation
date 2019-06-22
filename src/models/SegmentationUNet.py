@@ -1,5 +1,5 @@
 from torch.nn import Module, ModuleList, Conv2d, MaxPool2d, ConvTranspose2d, \
-    BatchNorm2d, ReLU, Sequential
+    BatchNorm2d, Sequential
 from torch.nn import functional as f
 from torch import cat
 

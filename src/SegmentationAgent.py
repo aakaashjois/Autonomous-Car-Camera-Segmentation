@@ -1,10 +1,10 @@
-import numpy as np
-from torch.utils.data import DataLoader
-from torch.optim import Adam
-
 from CustomLoss import CustomLoss
 from SegmentationDataset import SegmentationDataset
 from models.SegmentationUNet import SegmentationUNet
+
+import numpy as np
+from torch.utils.data import DataLoader
+from torch.optim import Adam
 
 
 class SegmentationAgent:
