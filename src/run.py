@@ -10,33 +10,24 @@ from torchsummary import summary
 
 from SegmentationAgent import SegmentationAgent
 
-NUM_DATA = 1000
-TRAIN_NUM = 800
-VAL_NUM = 10
+VAL_PERCENTAGE = 0.2
+TEST_NUM = 10
 NUM_CLASSES = 13
 BATCH_SIZE = 16
 IMG_SIZE = 224
-DATA_PATH = Path('../input/datab/dataB/')
+DATA_PATH = Path('../input')
 SHUFFLE = True
 LR = 0.001
 EPOCHS = 30
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-params = {
-    'batch_size': BATCH_SIZE,
-    'num_classes': NUM_CLASSES,
-    'epochs': EPOCHS,
-    'image_size': IMG_SIZE,
-    'lr': LR
-}
-
-agent = SegmentationAgent(NUM_DATA, TRAIN_NUM, VAL_NUM, NUM_CLASSES,
+agent = SegmentationAgent(VAL_PERCENTAGE, TEST_NUM, NUM_CLASSES,
                           BATCH_SIZE, IMG_SIZE, DATA_PATH, SHUFFLE, LR, DEVICE)
 
 trainer = create_supervised_trainer(agent.model, agent.optimizer,
                                     agent.criterion)
 evaluator = create_supervised_evaluator(agent.model, metrics={
-    'accuracy': Accuracy(), 'loss': Loss(agent.criterion)
+        'accuracy': Accuracy(), 'loss': Loss(agent.criterion)
 })
 
 train_accuracy = []
@@ -54,8 +45,8 @@ def log_training_results(engine):
     train_accuracy.append(avg_accuracy)
     train_loss.append(avg_loss)
     print(
-        "Training - Epoch: {} Avg accuracy: {:.2f} Avg loss: {:.2f}".format(
-            engine.state.epoch, avg_accuracy, avg_loss))
+            "Training - Epoch: {} Accuracy: {:.2f} Loss: {:.2f}".format(
+                    engine.state.epoch, avg_accuracy, avg_loss))
 
 
 @trainer.on(Events.EPOCH_COMPLETED)
@@ -67,8 +58,8 @@ def log_validation_results(engine):
     validation_accuracy.append(avg_accuracy)
     validation_loss.append(avg_loss)
     print(
-        "Validation - Epoch: {} Avg accuracy: {:.2f} Avg loss: {:.2f}".format(
-            engine.state.epoch, avg_accuracy, avg_loss))
+            "Validation - Epoch: {} Accuracy: {:.2f} Loss: {:.2f}".format(
+                    engine.state.epoch, avg_accuracy, avg_loss))
 
 
 summary(agent.model, (3, IMG_SIZE, IMG_SIZE))
