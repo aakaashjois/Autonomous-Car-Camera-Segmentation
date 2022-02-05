@@ -103,12 +103,12 @@ class SegmentationUNet(Module):
         for i in range(depth):
             ins = self.in_channels if i == 0 else outs
             outs = self.start_filts * (2 ** i)
-            pooling = True if i < depth - 1 else False
+            pooling = i < depth - 1
 
             down_conv = DownConv(ins, outs, pooling=pooling)
             self.down_convs.append(down_conv)
 
-        for i in range(depth - 1):
+        for _ in range(depth - 1):
             ins = outs
             outs = ins // 2
             up_conv = UpConv(ins, outs)
@@ -124,7 +124,7 @@ class SegmentationUNet(Module):
         x = x.to(self.device)
         encoder_outs = []
 
-        for i, module in enumerate(self.down_convs):
+        for module in self.down_convs:
             x, before_pool = module(x)
             encoder_outs.append(before_pool)
 

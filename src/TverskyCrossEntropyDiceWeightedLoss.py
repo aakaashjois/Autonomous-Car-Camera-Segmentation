@@ -68,5 +68,4 @@ class TverskyCrossEntropyDiceWeightedLoss(Module):
         ce = cross_entropy(pred, target,
                            weight=self.class_dice(pred, target).to(self.device))
         tv = self.tversky_loss(pred, target)
-        loss = (cross_entropy_weight * ce) + (tversky_weight * tv)
-        return loss
+        return (cross_entropy_weight * ce) + (tversky_weight * tv)
